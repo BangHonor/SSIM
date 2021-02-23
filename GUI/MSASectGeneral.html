@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+    <script src="js/jquery/jquery.js"></script>
+    <script src="js/pixi.min.js"></script>
+    <script>
+        //////////////////////////////////////////////////////////////
+        const app = new PIXI.Application({
+            width: 320,
+            height: 270,
+            antialias: true,    // default: false
+            transparent: false, // default: false
+            resolution: 1       // default: 1
+        })
+        app.renderer.backgroundColor = 0xffffff;
+        document.body.appendChild(app.renderer.view)
+        //自定义容器
+        const Container = new PIXI.Container()
+        app.stage.addChild(Container);
+        Container.backgroundColor = 0x000000;
+        Container.rotation -= Math.PI;
+
+        //画线
+        function drawLine(x0, y0, x1, y1) {
+            let lineZ = new PIXI.Graphics();
+            lineZ.lineStyle(2, 0x000000, 1);
+            lineZ.moveTo(x0, y0);
+            lineZ.lineTo(x1, y1);
+            return lineZ
+        }
+
+        let style1 = new PIXI.TextStyle({
+            fontFamily: "Arial",
+            fontSize: 20,
+
+            fill: "black"
+        });
+        let style2 = new PIXI.TextStyle({
+            fontFamily: "Arial",
+            fontSize: 20,
+
+            fill: "green"
+        });
+
+        //文字
+        function drawMessage(text, style, x, y) {
+            let message = new PIXI.Text(text, style);
+            message.position.set(x, y)
+            return message
+        }
+
+        function drawCircle(x, y, rad) {
+            let circle = new PIXI.Graphics();
+            circle.beginFill(0xFF0000);
+            circle.drawCircle(x, y, rad);
+            circle.endFill();
+            return circle
+        }
+
+        //////////////////////////////////////////////////////////////
+        var Nodes = new Array();
+        var NodesNum = new Array();
+        var Segments = new Array();
+        var SegmentsNum = new Array();
+        var nodeRec = [];   //记录那个ID有数据，方便导出
+        var segRec = [];
+        //////////////////////////////////////////////////////////////
+
+        //字典存储节点数据
+        function Dictionary() {
+            this.Z = [];
+            this.Y = [];
+            this.add = add;         // 添加元素
+            this.find = find;       // 查找元素
+            this.remove = remove;   // 删除元素
+            //向字典添加元素
+
+            function add(key, valueZ, valueY) {
+                this.Z[key] = valueZ;
+                this.Y[key] = valueY;
+            }
+            //删除一个元素
+
+            function remove(key) {
+                if (this.Y[key]) {
+                    delete this.Z[key];
+                    delete this.Y[key];
+                }
+                else return 'Not Found';
+            }
+            //查找字典中的元素
+
+            function find(key) {
+                return this.Z[key];
+            }
+        }
+        //创建实例
+        var directory = new Dictionary();
+
+        //Add1
+        //每次添加前判断是否超出范围
+        var minScaleX = 1
+        var minScaleY = 1
+        var scaleX
+        var scaleY
+        function Add1(ID1,Z,Y) {
+            if (directory.find(ID1)) {
+                window.parent.$("Status").innerHTML = `ID already existed!`
+            }
+            else if (ID1 && Z && Y) {
+                window.parent.$("Status").innerHTML = `&emsp; &emsp; &emsp; &emsp; &emsp; `
+                var li = document.createElement('li'); //1、创建元素
+                li.innerHTML = ID1;
+                li.setAttribute("id", ID1);
+                li.onclick = function () {
+                    ID = event.srcElement.id
+                    window.parent.document.getElementById("ID1").value = ID;
+                    window.parent.document.getElementById("Z").value = directory.Z[ID]
+                    window.parent.document.getElementById("Y").value = directory.Y[ID]
+                };
+
+                var container = window.parent.document.getElementsByTagName("ul")[0];//2、找到父级元素
+                container.appendChild(li); //3、在末尾中添加元素
+                directory.add(ID1, Z, Y);
+                Z = parseInt(Z, 10)
+                Y = parseInt(Y, 10)
+
+                //设置container容器原点
+                Container.pivot.x = Container.width / 2;
+                Container.pivot.y = Container.height / 2;
+                Container.x = app.renderer.width / 2;
+                Container.y = app.renderer.height / 2;
+
+
+
+                var Circle = drawCircle(Z, Y, 4)
+                Circle.pivot.x = Circle.width / 2;
+                Circle.pivot.y = Circle.height / 2;
+
+                var number = drawMessage(ID1, style1, Z, Y)
+                number.pivot.x = number.width / 2;
+                number.pivot.y = number.height / 2;
+                number.rotation -= Math.PI;
+
+                Container.addChild(Circle, number)
+                Container.scale.x = minScaleX
+                Container.scale.y = minScaleY
+
+                Nodes[ID1] = Circle//把图中的对象装进数组进行管理，其id即序号
+                NodesNum[ID1] = number
+                nodeRec[ID1] = 1;
+
+                if (Z > 160) {
+                    Container.scale.x = 160 / Math.abs(Z) * 0.8
+                    if (Container.scale.x <= minScaleX) {
+                        minScaleX = Container.scale.x
+                    }
+                    else {
+                        Container.scale.x = minScaleX
+                    }
+                }
+                if (-Z > 160) {
+                    Container.scale.x = 160 / Math.abs(Z) * 0.5
+                    if (Container.scale.x <= minScaleX) {
+                        minScaleX = Container.scale.x
+                    }
+                    else {
+                        Container.scale.x = minScaleX
+                    }
+                }
+                if (Y > 135) {
+                    Container.scale.y = 135 / Math.abs(Y) * 0.8
+                    if (Container.scale.y <= minScaleY) {
+                        minScaleY = Container.scale.y
+                    }
+                    else {
+                        Container.scale.y = minScaleY
+                    }
+                }
+                if (-Y > 135) {
+                    Container.scale.y = 135 / Math.abs(Y) * 0.5
+                    if (Container.scale.y <= minScaleY) {
+                        minScaleY = Container.scale.y
+                    }
+                    else {
+                        Container.scale.y = minScaleY
+                    }
+                }
+
+                var i
+
+                for (i in NodesNum) {
+                    NodesNum[i].width = 15 / minScaleX
+                    NodesNum[i].height = 15 / minScaleY
+                }
+            }
+        }
+        //Modify1
+        function Modify1(ID1, Z, Y) {
+            if (!directory.find(ID1)) {
+                window.parent.$("Status").innerHTML = `Use Add!&emsp;&emsp;`
+            }
+            else if (ID1 && Z && Y) {
+                window.parent.$("Status").innerHTML = `&emsp; &emsp; &emsp; &emsp; &emsp; `
+                directory.remove(ID1);
+                Container.removeChild(Nodes[ID1], NodesNum[ID1])
+
+                directory.add(ID1, Z, Y);
+                Z = parseInt(Z, 10)
+                Y = parseInt(Y, 10)
+                var Circle = drawCircle(Z, Y, 4)
+                var number = drawMessage(ID1, style1, Z, Y)
+                number.rotation -= Math.PI;
+
+                Container.addChild(Circle, number)
+                Nodes[ID1] = Circle
+                NodesNum[ID1] = number
+
+            }
+        }
+        //Delete1
+        function Delete1(ID1) {
+            directory.remove(ID1);//在字典中删除
+            window.parent.document.getElementById(ID1).remove(); //在id前加上#(ID1)
+            Container.removeChild(Nodes[ID1], NodesNum[ID1])//图中删除
+            nodeRec[ID1] = 0;
+        }
+        //////////////////////////////////////////////////////////////
+        //字典存储线段数据
+        function Dictionary2() {
+            this.I = [];
+            this.J = [];
+            this.t = [];
+            this.add = add;         // 添加元素
+            this.find = find;       // 查找元素
+            this.remove = remove;   // 删除元素
+            //向字典添加元素
+
+            function add(key, Start, End, Thickness) {
+                this.I[key] = Start
+                this.J[key] = End
+                this.t[key] = Thickness
+            }
+
+            //删除一个元素
+
+            function remove(key) {
+                if (this.I[key]) {
+                    delete this.I[key]
+                    delete this.J[key]
+                    delete this.t[key]
+                }
+                else return 'Not Found';
+            }
+            //查找字典中的元素
+
+            function find(key) {
+                return this.I[key]
+            }
+        }
+        //创建实例
+        var directory2 = new Dictionary2();
+        //按钮函数,避免li的ID重叠
+        function Add2(ID2, Start, End, Thickness) {
+            //当不重复且输入了四个值时，插入列表,重复时提醒
+            if (!directory.find(Start) || !directory.find(End)) {
+                window.parent.document.getElementById("Status").innerHTML = `Node not exist!`
+            }
+            else if (directory2.find(ID2)) {
+                window.parent.document.getElementById("Status").innerHTML = `ID already existed!`
+            }
+            else if (ID2 && Start && End && Thickness) {
+                console.log(ID2,Start,End,Thickness)
+                window.parent.document.getElementById("Status").innerHTML = `&emsp; &emsp; &emsp; &emsp; &emsp; `
+                var li = document.createElement('li'); //1、创建元素
+                li.innerHTML = ID2;
+                li.setAttribute("id", -ID2);//注意不要和上面重叠
+                li.onclick = function () {
+                    var ID2 = -event.srcElement.id
+                    window.parent.document.getElementById("ID2").value = ID2;
+                    window.parent.document.getElementById("Start").value = directory2.I[ID2]
+                    window.parent.document.getElementById("End").value = directory2.J[ID2]
+                    window.parent.document.getElementById("Thickness").value = directory2.t[ID2]
+                };
+
+                var container = window.parent.document.getElementsByTagName("ul")[1];//2、找到父级元素
+                container.appendChild(li); //3、在末尾中添加元素
+                directory2.add(ID2, Start, End, Thickness);
+                //字典key里面都是正的
+                Start = parseInt(Start, 10)
+                End = parseInt(End, 10)
+                Thickness = parseInt(Thickness, 10)
+                var Z0 = parseInt(directory.Z[Start], 10)
+                var Y0 = parseInt(directory.Y[Start], 10)
+                var Z1 = parseInt(directory.Z[End], 10)
+                var Y1 = parseInt(directory.Y[End], 10)
+
+
+                var line = drawLine(Z0, Y0, Z1, Y1)
+                var number = drawMessage(ID2, style2, (Z0 + Z1) / 2, (Y0 + Y1) / 2)
+                number.rotation -= Math.PI;
+                Container.addChild(line, number)
+                Segments[ID2] = line
+                SegmentsNum[ID2] = number
+                segRec[ID2] = 1;
+
+                for (i in SegmentsNum) {
+                    SegmentsNum[i].width = 15 / minScaleX
+                    SegmentsNum[i].height = 15 / minScaleY
+                }
+            }
+        }
+        //Modify
+        function Modify2(ID2, Start, End, Thickness) {
+            var ID2 = window.parent.document.getElementById("ID2").value;
+            var Start = window.parent.document.getElementById("Start").value;
+            var End = window.parent.document.getElementById("End").value;
+            var Thickness = window.parent.document.getElementById("Thickness").value;
+
+            if (!directory2.find(ID2)) 
+                window.parent.document.getElementById("Status").innerHTML = `Use Add!&emsp;&emsp;`
+            else if (!directory.find(Start) || !directory.find(End)) 
+                window.parent.document.getElementById("Status").innerHTML = `Node does not exist!`
+            else if (ID2 && Start && End && Thickness) {
+                window.parent.$("Status").innerHTML = `&emsp; &emsp; &emsp; &emsp; &emsp; `
+                directory2.remove(ID2);
+                directory2.add(ID2, Start, End, Thickness);
+                Container.removeChild(Segments[ID2], SegmentsNum[ID2])
+
+                Start = parseInt(Start, 10)
+                End = parseInt(End, 10)
+                Thickness = parseInt(Thickness, 10)
+                var Z0 = parseInt(directory.Z[Start], 10)
+                var Y0 = parseInt(directory.Y[Start], 10)
+                var Z1 = parseInt(directory.Z[End], 10)
+                var Y1 = parseInt(directory.Y[End], 10)
+
+
+                var line = drawLine(Z0, Y0, Z1, Y1)
+                var number = drawMessage(ID2, style2, (Z0 + Z1) / 2, (Y0 + Y1) / 2)
+                number.rotation -= Math.PI;
+
+                Container.addChild(line, number)
+                Segments[ID2] = line
+                SegmentsNum[ID2] = number
+            }
+        }
+        //Delete
+        function Delete2(ID2) {
+            directory2.remove(ID2);//在字典中删除
+            window.parent.document.getElementById(-ID2).remove(); //在id前加上#(ID1)
+            Container.removeChild(Segments[ID2], SegmentsNum[ID2])//图中删除
+            segRec[ID2] = 0;
+        }
+        //////////////////////////////////////////////////////////////
+        //导出
+        function GeometryData() {
+            var data = { NODE:[], SEGMENT:[]};
+            var ncseg = new Array(1000).fill(0);
+            for (var i = 0; i < segRec.length; i++) {
+                if (segRec[i] == 1) {
+                    data.SEGMENT.push([parseFloat(i), parseFloat(directory2.I[i]), parseFloat(directory2.J[i]), parseFloat(directory2.t[i])]);
+                    ncseg[directory2.I[i]]++;
+                    ncseg[directory2.J[i]]++;
+                }
+            }
+            for (var i = 0; i < nodeRec.length; i++) {//i是id而不是从0开始的编号
+                if (nodeRec[i] == 1) {
+                    data.NODE.push([parseFloat(i), parseFloat(directory.Y[i]), parseFloat(directory.Z[i]), parseFloat(directory.Z[i]), parseFloat(ncseg[i])]);
+                }
+            }
+            
+            return data;
+        }
+    </script>
+</body>
+</html>

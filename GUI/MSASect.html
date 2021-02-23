@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+	<title>MSASect(Nonsymmetric Section)</title>
+	<style>
+		body, html {
+			height: 530px;
+			width: 850px;
+			overflow: hidden;
+			background-color: black;
+		}
+
+		#SectionType {
+			margin-top: 10px;
+			margin-left: 4px;
+			background-color: grey;
+			width: 50%;
+			height: 22%;
+			padding: 5px 2px 2px 2px;
+		}
+
+		#Dimensions {
+			margin-top: 1%;
+			margin-left: 4px;
+			background-color: grey;
+			width: 50%;
+			height: 32%;
+			padding: 5px 2px 2px 2px;
+		}
+
+		#SectionProperties {
+			margin-top: 1%;
+			margin-left: 4px;
+			background-color: grey;
+			width: 98%;
+			height: 6%;
+			line-height: 25px;
+		}
+
+		#Area {
+			margin-top: 1%;
+			margin-left: 4px;
+			background-color: grey;
+			width: 98%;
+			height: 19%;
+		}
+
+		#bottom {
+			margin-top: 1%;
+			margin-left: 4px;
+			background-color: grey;
+			width: 98%;
+			height: 6%;
+			line-height: 25px;
+		}
+
+
+		#Graph {
+			float: left;
+			margin-left: 30px;
+			background-color: white;
+			width: 320px;
+			height: 270px;
+			margin-right: 60px;
+			overflow: hidden;
+		}
+
+		#rotate {
+			float: right;
+			-ms-transform: rotate(90deg); /* Internet Explorer 9*/
+			-moz-transform: rotate(90deg); /* Firefox */
+			-webkit-transform: rotate(90deg); /* Safari 和 Chrome */
+			-o-transform: rotate(90deg); /* Opera */
+			filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1);
+			margin-left: 20px;
+		}
+
+		#fieldset {
+			width: 93%;
+			height: 88%;
+			margin-left: 2px;
+			border: solid 1px white;
+		}
+
+		#content1 {
+			display: grid;
+			grid-template-rows: 25% 25% 25%;
+			/*共三行，每行行高60px*/
+			grid-template-columns: 40% 30% 30%;
+			/*共三列，每列列宽60px*/
+		}
+
+		#content1General {
+			display: grid;
+			grid-template-rows: 45% 45% 45%;
+			/*共三行，每行行高60px*/
+			grid-template-columns: 25% 25% 25% 25%;
+			/*共三列，每列列宽60px*/
+		}
+
+		#content2 {
+			display: grid;
+			height: 80px;
+			width: 360px;
+			grid-template-rows: 40% 40% 40% 40%;
+			/*共三行，每行行高60px*/
+			grid-template-columns: 55% 55%;
+		}
+
+		#content2General {
+			display: grid;
+			grid-template-rows: 30% 30% 30% 30%;
+			/*共三行，每行行高60px*/
+			grid-template-columns: 25% 25% 25% 25%;
+			/*共三列，每列列宽60px*/
+		}
+
+		#content3 {
+			height: 90%;
+			font-size: 12px;
+			line-height: 35px;
+			display: grid;
+			grid-template-rows: 40% 40% 40%;
+			/*共三行，每行行高60px*/
+			grid-template-columns: 20% 20% 20% 20% 20%;
+		}
+
+		.item {
+			font-size: 12px;
+			border: 1px solid #000;
+			color: black;
+			border: none;
+			float: left;
+			line-height: 30px;
+
+		}
+
+		ul {
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+			width: 90px;
+			background-color: #f1f1f1;
+			position: fixed;
+			height: 15%;
+			overflow: scroll;
+		}
+
+		li {
+			display: block;
+			text-align: center;
+		}
+
+		li:active {
+				background-color: cornflowerblue;
+			}
+
+		.disabled {
+			background-color: lightgrey;
+			overflow: hidden;
+			text-align: center;
+			color: black;
+		}
+
+		.button {
+			width: 45%;
+			border-radius: 0px;
+			outline: none;
+		}
+
+		.able {
+			outline: none;
+			text-align: center;
+		}
+	</style>
+	<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+	<script src="js/pixi.min.js"></script>
+</head>
+<body>
+	<script src="js/jquery/jquery.js"></script>
+	<script>
+		const { ipcRenderer, remote } = require('electron')
+		const { dialog } = require('electron').remote
+		var fs = require('fs');
+		//general部分
+		function General() {
+			document.getElementById("legend1").innerHTML = `Nodes`
+			document.getElementById("legend2").innerHTML = `Segments`
+
+
+			//修改上部分的显示
+			document.getElementById("content1").innerHTML = ``
+			document.getElementById("content1General").innerHTML = `
+											<div  style="grid-row:1/4">
+												<ul id="ul1"></ul>
+											</div>
+											<div><input type="text"  class="able" readonly="readonly" style="border:none;width:80px;background-color:lightgrey" value="ID" ></div>
+											<div><input type="text" class="able"  id="ID1"  style="border:none;width:80px;"></div>
+											<div><input type="button" id="Add1" onclick="Add1()" style="width:80px;" value="Add" ></div>
+											<div><input type="text" class="able" readonly="readonly" style="border:none;width:80px;background-color:lightgrey" value="Z-Coor"></div>
+											<div><input type="text"  class="able"id="Z" style="border:none;width:80px;"></div>
+											<div><input type="button" id="Modify1" onclick="Modify1()" style="width:80px;" value="Modify" ></div>
+											<div><input type="text" class="able" readonly="readonly" style="border:none;width:80px;background-color:lightgrey" value="Y-Coor"></div>
+											<div><input type="text"  class="able"id="Y" style="border:none;width:80px;"></div>
+											<div><input type="button" id="Delete1" onclick="Delete1()" style="width:80px;" value="Delete" ></div>`
+
+			//修改中间部分显示
+			document.getElementById("content2").innerHTML = ``
+			document.getElementById("Dimensions button").innerHTML = ``
+			document.getElementById("content2").style.height = "0px";
+			document.getElementById("content2General").innerHTML = `
+											<div  style="grid-row:1/5">
+												<ul  id="ul2" style="list-style-type: none;
+													margin: 0;
+													padding: 0;
+													width: 90px;
+													background-color: #f1f1f1;
+													position: fixed;
+													height: 25%;
+													overflow:scroll;">
+												</ul>
+											</div>
+											<div><input type="text" class="able" readonly="readonly" style="border:none;width:80px;background-color:lightgrey" value="ID"></div>
+											<div><input type="text" class="able" id="ID2" style="width:80px;"></div>
+											<div><input type="button" id="Add2" onclick="Add2()" style="width:80px;" value="Add" ></div>
+											<div><input type="text" class="able" readonly="readonly" style="border:none;width:80px;background-color:lightgrey" value="Start-Node"></div>
+											<div><input type="text" class="able" id="Start" style="width:80px;"></div>
+											<div><input type="button" id="Modify2" onclick="Modify2()" style="width:80px;" value="Modify" ></div>
+											<div><input type="text" class="able" readonly="readonly" style="border:none;width:80px;background-color:lightgrey" value="End Node"></div>
+											<div><input type="text"  class="able" id="End" style="width:80px;"></div>
+											<div><input type="button" id="Delete2" onclick="Delete2()" style="width:80px;" value="Delete" ></div>
+											<div><input type="text" class="able" readonly="readonly" style="border:none;width:80px;background-color:lightgrey" value="Thickness"></div>
+											<div><input type="text" class="able" id="Thickness" style="width:80px;"></div>`
+
+			document.getElementById("SectionProperties").innerHTML = `
+							<input type="button" onclick="calculate()" style="font-size:15px" value="&nbsp;Calculate&nbsp;">&emsp; &emsp; &emsp; &emsp; &emsp;
+							<label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;Status:&nbsp;&nbsp;&nbsp;</label>&nbsp;<label id="Status" style="background-color:lightgrey; color:red">&emsp; &emsp; &emsp; &emsp; &emsp; </label>`
+
+			//修改area栏
+			document.getElementById("Area").innerHTML = `<div id="Area">
+		<div style="width:100%;font-size:12px;line-height:250%;display: grid;grid-template-rows:100%;grid-template-columns: 20% 20% 20% 20% 20% ;background-color:grey;margin-top:1px;margin-bottom:1px;">
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="Area">&nbsp;<input class="able" style="width:50%;" type="text" id="A"></div>
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="I z-z">&nbsp;<input class="able" style="width:50%;" type="text" id="I z-z"></div>
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="I y-y">&nbsp;<input class="able" style="width:50%;" type="text" id="I y-y"></div>
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="J">&nbsp;<input class="able" style="width:50%;" type="text" id="J"></div>
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="Cw">&nbsp;<input class="able" style="width:50%;" type="text" id="Cw"></div>
+		</div>
+		<div style="width:100%;font-size:12px;line-height:250%;display: grid;grid-template-rows:100%;grid-template-columns: 20% 20% 20% 20% 20%;background-color:grey;margin-top:1px;margin-bottom:1px;">
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="Ysc">&nbsp;<input class="able" style="width:50%;" type="text" id="Ysc"></div>
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="Zsc">&nbsp;<input class="able" style="width:50%;" type="text" id="Zsc"></div>
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="BetaV">&nbsp;<input class="able" style="width:50%;" type="text" id="BetaV"></div>
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="BetaW">&nbsp;<input class="able" style="width:50%;" type="text" id="BetaW"></div>
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="Betaw">&nbsp;<input class="able" style="width:50%;" type="text" id="Betaw"></div>
+		</div>
+		<div style="width:100%;font-size:12px;line-height:250%;display: grid;grid-template-rows:100%;grid-template-columns: 20% 20% 20% 20% 20%;background-color:grey;margin-top:1px;margin-bottom:1px;">
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="Z w-w">&nbsp;<input class="able" style="width:50%;" type="text" id="Z w-w"></div>
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="Z v-v">&nbsp;<input class="able" style="width:50%;" type="text" id="Z v-v"></div>
+			<div class="cal" style="display:inline"></div>
+			<div class="cal" style="display:inline"></div>
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="Iyz">&nbsp;<input class="able" style="width:50%;" type="text" id="Iyz"></div>
+		</div>
+	</div>`
+			//修改bottom
+			document.getElementById("bottom").innerHTML = `
+									<div style="display:inline;">
+										<span style="margin-top:40px; display:inline">
+											&emsp; <input type="button" onclick="Reset()" style="font-size:15px" value="&nbsp;&nbsp;&nbsp;Reset&nbsp;&nbsp;&nbsp;">
+											&emsp; <input type="button" onclick="Open()" style="font-size:15px" value="&nbsp;&nbsp;&nbsp;Open&nbsp;&nbsp;&nbsp;">
+											&emsp; <input type="button" onclick="Save()" style="font-size:15px" value="&nbsp;&nbsp;&nbsp;Save&nbsp;&nbsp;&nbsp;">
+											&emsp; <input type="button" onclick="SaveAs()" style="font-size:15px" value="&nbsp;&nbsp;&nbsp;Save As&nbsp;&nbsp;&nbsp;">
+											&emsp;&emsp; &emsp; &emsp; &emsp; &emsp;<input type="button" onclick="Export()" style="font-size:15px" value="&nbsp;&nbsp;&nbsp;Export to Mastan3&nbsp;&nbsp;&nbsp;">&emsp;<input type="button" onclick="Cancel()" style="font-size:15px" value="&nbsp;&nbsp;&nbsp;Cancel&nbsp;&nbsp;&nbsp;">
+										</span>
+									</div>`
+			document.getElementById("Graph").src = "MSASectGeneral.html"
+			console.log(document.getElementById("Graph").src)
+		}
+		//////////////////////////////////////////////////////////////
+		function Add1() {
+			var ID1 = window.parent.document.getElementById("ID1").value
+			var Z = window.parent.document.getElementById("Z").value
+			var Y = window.parent.document.getElementById("Y").value
+			document.getElementById("Graph").contentWindow.Add1(ID1,Z,Y);
+		}
+		function Modify1() {
+			var ID1 = window.parent.document.getElementById("ID1").value
+			var Z = window.parent.document.getElementById("Z").value
+			var Y = window.parent.document.getElementById("Y").value
+			document.getElementById("Graph").contentWindow.Modify1(ID1,Z,Y);
+		}
+		function Delete1() {
+			var ID1 = window.parent.document.getElementById("ID1").value
+			document.getElementById("Graph").contentWindow.Delete1(ID1);
+		}
+		function Add2() {
+			var ID2 = window.parent.document.getElementById("ID2").value;
+			var Start = window.parent.document.getElementById("Start").value;
+			var End = window.parent.document.getElementById("End").value;
+			var Thickness = window.parent.document.getElementById("Thickness").value;
+			document.getElementById("Graph").contentWindow.Add2(ID2, Start, End, Thickness);
+		}
+		function Modify2() {
+			var ID2 = window.parent.document.getElementById("ID2").value;
+			var Start = window.parent.document.getElementById("Start").value;
+			var End = window.parent.document.getElementById("End").value;
+			var Thickness = window.parent.document.getElementById("Thickness").value;
+			document.getElementById("Graph").contentWindow.Modify2(ID2, Start, End, Thickness);
+		}
+		function Delete2() {
+			var ID2 = window.parent.document.getElementById("ID2").value;
+			document.getElementById("Graph").contentWindow.Delete2(ID2);
+		}
+		//////////////////////////////////////////////////////////////
+	</script>		<!--放在iframe的前面 否则会失效！-->
+	<div id="right top" style="float: right;width:400px;height:320px">
+		<div style="color:yellow;text-align:center">Section View</div>
+		<div id="iframe" style="width:400px;height:270px;display:inline">
+			<iframe id="Graph" name="Graph" src="MSASectGraph.html" style="width:320px">
+			</iframe>
+		</div>
+		<div style="color:white;text-align:center">(+)< -----Z-----(-)</div>
+	</div>
+	<div id="SectionType">
+		<fieldset id="fieldset">
+			<legend id="legend1" style="color:white">Section Type</legend>
+			<div id="content1">
+				<div class="item"><input type="radio" name="type">Mono-Symmetric</div>
+				<div class="item"><input type="radio" name="type">T-Shape</div>
+				<div class="item"><input type="radio" name="type">Z-Shape</div>
+				<div class="item"><input type="radio" name="type">C-Shape</div>
+				<div class="item"><input type="radio" name="type">L-Shape</div>
+				<div class="item"><input type="radio" name="type">Elli-Shape</div>
+				<div class="item"><input type="radio" name="type">Rec-Shape</div>
+				<div class="item"><input type="radio" name="type">Trap-Shape</div>
+				<div class="item"><input type="radio" name="type">General</div>
+			</div>
+			<div id="content1General"></div>
+		</fieldset>
+	</div>
+	<div id="Dimensions">
+		<fieldset id="fieldset">
+			<legend id="legend2" style="color:white">Dimensions</legend>
+			<div id="content2">
+				<div class="item"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+				<div class="item"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t1=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+				<div class="item"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;D=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+				<div class="item"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t2=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+			</div>
+			<div id="content2General"></div>
+			<div id="Dimensions button" style="margin-top:30px; display:inline;"><input type="button" style="font-size:15px" value="&nbsp;Calculate&nbsp;">&nbsp;&nbsp<input type="button" style="font-size:15px" value="&nbsp;Convert to General&nbsp;"><span style="margin-left:2%;background-color:lightgrey;width:30%"><input type="radio" style="font-size:15px">Database&nbsp;&nbsp;</span></div>
+		</fieldset>
+	</div>
+	<div id="SectionProperties">
+		<div style="display:inline;">
+			<label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;Section Properties&nbsp;&nbsp;&nbsp;</label>&emsp;
+			<label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;Name:&nbsp;&nbsp;&nbsp;</label><label style="background-color:lightgrey;"></label>&nbsp;
+			<input type="text" style="width:80px;">&emsp; <label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Phi=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;
+			<label style="background-color:lightgrey;">&emsp; &emsp; &emsp; &emsp; &emsp;  </label>&emsp;
+			<label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;Status:&nbsp;&nbsp;&nbsp;</label>&nbsp;<label id="Status" style="background-color:lightgrey; color:red">&emsp; &emsp; &emsp; &emsp; &emsp; </label>
+		</div>
+	</div>
+	<div id="Area">
+		<div style="width:100%;font-size:12px;line-height:250%;display: grid;grid-template-rows:100%;grid-template-columns: 20% 20% 20% 20% 20% ;background-color:grey;margin-top:1px;margin-bottom:1px;">
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="Area">&nbsp;<input class="able" style="width:50%;" type="text" id="A"></div>
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="I z-z">&nbsp;<input class="able" style="width:50%;" type="text" id="I z-z"></div>
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="I y-y">&nbsp;<input class="able" style="width:50%;" type="text" id="I y-y"></div>
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="J">&nbsp;<input class="able" style="width:50%;" type="text" id="J"></div>
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="Cw">&nbsp;<input class="able" style="width:50%;" type="text" id="Cw"></div>
+		</div>
+		<div style="width:100%;font-size:12px;line-height:250%;display: grid;grid-template-rows:100%;grid-template-columns: 20% 20% 20% 20% 20%;background-color:grey;margin-top:1px;margin-bottom:1px;">
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="Ysc">&nbsp;<input class="able" style="width:50%;" type="text" id="Ysc"></div>
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="Zsc">&nbsp;<input class="able" style="width:50%;" type="text" id="Zsc"></div>
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="BetaV">&nbsp;<input class="able" style="width:50%;" type="text" id="BetaV"></div>
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="BetaW">&nbsp;<input class="able" style="width:50%;" type="text" id="BetaW"></div>
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="Betaw">&nbsp;<input class="able" style="width:50%;" type="text" id="Betaw"></div>
+		</div>
+		<div style="width:100%;font-size:12px;line-height:250%;display: grid;grid-template-rows:100%;grid-template-columns: 20% 20% 20% 20% 20%;background-color:grey;margin-top:1px;margin-bottom:1px;">
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="Z w-w">&nbsp;<input class="able" style="width:50%;" type="text" id="Z w-w"></div>
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="Z v-v">&nbsp;<input class="able" style="width:50%;" type="text" id="Z v-v"></div>
+			<div class="cal" style="display:inline"></div>
+			<div class="cal" style="display:inline"></div>
+			<div class="cal" style="display:inline"><input class="disabled" disabled="disabled" style="width:25%" type="text" readonly value="Iyz">&nbsp;<input class="able" style="width:50%;" type="text" id="Iyz"></div>
+		</div>
+	</div>
+	<div id="bottom">
+		<div style="display:inline;">
+			<span style="margin-top:40px; display:inline">
+				<input type="button" onclick="Reset()" style="font-size:15px" value="&nbsp;&nbsp;&nbsp;Reset&nbsp;&nbsp;&nbsp;">
+				&emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp;
+				<input type="button" onclick="Export()" style="font-size:15px" value="&nbsp;&nbsp;&nbsp;Export to Mastan3&nbsp;&nbsp;&nbsp;">&emsp;
+				<input type="button" onclick="Cancel()" style="font-size:15px" value="&nbsp;&nbsp;&nbsp;Cancel&nbsp;&nbsp;&nbsp;">
+			</span>
+		</div>
+	</div>
+	<script>
+		var res;//json格式
+		function calculate() {
+			var data = document.getElementById("Graph").contentWindow.GeometryData();
+			console.log(data)
+			$.ajax({
+				type: "POST",
+				url: 'http://127.0.0.1:5858/cal',
+				data: JSON.stringify(data),
+				timeout: 3500,
+				success: function (result) {
+					alert("CalSection Success!")
+					//console.log(typeof (result))
+					var jsonRes = eval("(" + result + ")");
+					res=jsonRes
+					console.log(result);
+					//科学计数法
+					document.getElementById("A").value = parseFloat(jsonRes.A).toExponential(3)
+					document.getElementById("I z-z").value = parseFloat(jsonRes.Iz).toExponential(3)
+					document.getElementById("I y-y").value = parseFloat(jsonRes.Iy).toExponential(3)
+					document.getElementById("J").value = parseFloat(jsonRes.J).toExponential(3)
+					document.getElementById("Cw").value = parseFloat(jsonRes.Iw).toExponential(3)
+					document.getElementById("Ysc").value = parseFloat(jsonRes.yc).toExponential(3)
+					document.getElementById("Zsc").value = parseFloat(jsonRes.zc).toExponential(3)
+					document.getElementById("BetaV").value = parseFloat(jsonRes.betay).toExponential(3)
+					document.getElementById("BetaW").value = parseFloat(jsonRes.betaz).toExponential(3)
+					document.getElementById("Betaw").value = parseFloat(jsonRes.betaw).toExponential(3)
+					document.getElementById("Iyz").value = parseFloat(jsonRes.Iyz).toExponential(3)
+				},
+				error: function (xhr, state, errorThrown) {
+					console.log("error")
+				}
+			});
+
+		}
+		function Reset() {
+			ipcRenderer.send("reload2")
+		}
+		var selectedFile;
+		function Open() {
+			var input = document.createElement('input');	//生成一个对象并自动点击
+			input.type = 'file';
+			input.onchange = e;
+			function e() {
+				selectedFile = input.files[0];
+				console.log(selectedFile)
+				var reader = new FileReader();//这是核心！！读取操作都是由它完成的
+				reader.readAsText(selectedFile, 'gb2312');
+				reader.onload = function (oFREvent) {//读取完毕从中取值
+					var data = oFREvent.target.result;
+					var obj = eval("(" + data + ")");
+					for (var key in obj) {
+						value = obj[key];
+						//创建点
+						if (key == "NODE") {		//每次只对一个key执行操作
+							var i = 0;
+							while (value[i]) {
+								var ID1 = value[i][0]
+								var Z = value[i][1]
+								var Y = value[i][2]
+								document.getElementById("Graph").contentWindow.Add1(ID1,Z,Y);
+								i++;
+							}
+						}
+						else if (key == "SEGMENT") {		//每次只对一个key执行操作
+							var i = 0;
+							while (value[i]) {
+								var ID2 = value[i][0]
+								var Start = value[i][1]
+								var End = value[i][2]
+								var Thickness = value[i][3]
+								document.getElementById("Graph").contentWindow.Add2(ID2,Start,End,Thickness);
+								i++;
+							}
+						}
+					}
+				}
+			}
+			input.click();
+		}
+		function Save(){//保存为json
+			if (selectedFile == undefined) {
+				dialog.showSaveDialog(remote.getCurrentWindow(), {
+					filters: [{ name: 'txt', extensions: ['txt'] }]
+				}).then(result => {
+					console.log(result.filePath)
+					//document.getElementById("center").contentWindow.readyToRead();
+					var data = document.getElementById("Graph").contentWindow.GeometryData();
+
+					var string = JSON.stringify(data)
+					fs.writeFileSync(result.filePath, string)
+					//console.log(data)
+				})
+			}
+			else {
+				var data = document.getElementById("Graph").contentWindow.GeometryData();
+				var string = JSON.stringify(data)
+				fs.writeFileSync(String(selectedFile), string)
+				console.log(data)
+			}
+		}
+		function SaveAs() {
+			dialog.showSaveDialog(remote.getCurrentWindow(), {
+				filters: [{ name: 'txt', extensions: ['txt'] }]
+			}).then(result => {
+				console.log(result.filePath)
+				var data = document.getElementById("Graph").contentWindow.GeometryData();
+				var string = JSON.stringify(data)
+				fs.writeFileSync(result.filePath, string)
+				console.log(data)
+			})
+		}
+		function Export() {
+			//不同窗口之间通过主进程进行数据交互
+			var data = document.getElementById("Graph").contentWindow.GeometryData();
+			ipcRenderer.send("Export",res)
+		}
+		function Cancel() {
+			ipcRenderer.send("CancelMSASect")
+		}
+	</script>
+</body>
+</html>

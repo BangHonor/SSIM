@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+	<title>Mastan3-A Cross-platform Structural Analysis Software</title>
+	<style>
+
+		body, html {
+			height: 100%;
+			width:100%;
+			margin: 0px;
+			padding: 0px;
+			overflow:hidden;
+			position:relative;
+		}
+		#center {
+			height:100%;
+			width: 100%;
+			z-index: 1;
+			position: absolute;
+		}
+		#bottom {
+			z-index: 2;
+			position:absolute;
+			bottom:0;
+			width:100%;
+		}
+
+		.disabled {
+			background-color: lightgrey;
+			overflow: hidden;
+			text-align: center;
+			color: black;
+		}
+
+		.button {
+			width: 45%;
+			border-radius: 0px;
+			outline: none;
+		}
+
+		.able {
+			outline:none;text-align: center;
+		}
+	</style>
+</head>
+<body>
+	<script src="js/jquery.js"></script>
+	<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+	<script src="js/bootstrap.js"></script>
+	<script src="./js/vue.js"></script>
+	<script src="../iniMenu.js"></script>
+	<script src="main.js"></script>
+	<script src="./Editor/editor/js/sweetalert2/dist/sweetalert2.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="./Editor/editor/js/sweetalert2/dist/sweetalert2.min.css">
+	<script>
+		Swal.fire({
+			width: 648,
+			padding: 200,
+			background: '#fff url(resources/images/OPen.jpg)',
+			showConfirmButton: false,
+			timer: 3500,
+
+		})
+		require("electron");
+		require('electron-connect').client.create();
+	</script>
+	<iframe id="center" src="center.html"></iframe>
+	<div id="bottom">
+		<div style="width:100%;font-size:12px;line-height:250%;display: grid;grid-template-rows:100%;grid-template-columns:30% 50% 25%;background-color:grey">
+			<div></div>
+			<div>&emsp;<input style="background-color:lightgrey;overflow:hidden;width:80%;text-align:center;font-weight:bold" disabled="disabled" type="text" readonly value="Welcome to MASTAN2 v5.1.12(September 9,2020)"></div>
+			<div></div>
+		</div>
+		<div style="font-size:12px;line-height:250%;display: grid;grid-template-rows:100%;grid-template-columns:100%;background-color:grey;margin-top:1px;margin-bottom:1px;">
+			<div class="cal" style="display:inline">&emsp;</div>
+		</div>
+	</div>
+</body>
+</html>

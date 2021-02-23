@@ -1,0 +1,14 @@
+{
+  "name": "Mastan 3",
+  "short_name": "Mastan 3",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "./images/icon.png",
+      "type": "image/png",
+      "sizes": "144x144"
+    }
+  ]
+}

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <title></title>
+    <style>
+
+
+    </style>
+</head>
+<body ontouchstart="">
+    <!--js-->
+    <script src="./js/vue.js"></script>
+    <script src="Editor/build/three.js" type="text/javascript"></script>
+    <script src="Editor/build/three.module.js" type="module"></script>
+    <script src="./js/threejs/OrbitControls.js" type="text/javascript"></script>
+    <script src="./js/threejs/Loaders/STLLoader.js" type="text/javascript"></script>
+    <script src="./js/WebGL.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="./Editor/editor/css/main.css">
+    <!-- TreeView-->
+    <!-- Required Stylesheets -->
+    <link href="./css/bootstrap.css" rel="stylesheet">
+    <!-- Required Javascript -->
+    <script src="js/jquery.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="./Editor/examples/js/controls/TransformControls.js"></script>
+    <script src="./Editor/examples/js/libs/chevrotain.min.js"></script>
+    <script src="./Editor/examples/js/libs/jszip.min.js"></script>
+    <script src="./Editor/examples/js/libs/inflate.min.js"></script>
+    <script src="./Editor/examples/js/exporters/ColladaExporter.js"></script>
+    <script src="./Editor/examples/js/exporters/GLTFExporter.js"></script>
+    <script src="./Editor/examples/js/exporters/OBJExporter.js"></script>
+    <script src="./Editor/examples/js/exporters/STLExporter.js"></script>
+    <script src="./Editor/examples/js/renderers/Projector.js"></script>
+    <script src="./Editor/examples/js/renderers/RaytracingRenderer.js"></script>
+    <script src="./Editor/examples/js/renderers/SVGRenderer.js"></script>
+
+
+    <script src="./Editor/editor/js/three.module.js" type="module"></script>
+    <script src="./Editor/editor/js/TransformControls.js"></script>    <!--//物体变换的操作，包括camera matrix-->
+
+    <script src="./Editor/editor/js/chevrotain.min.js"></script> <!-- VRML -->
+    <script src="./Editor/editor/js/jszip.min.js"></script>
+    <script src="./Editor/editor/js/inflate.min.js"></script> <!-- FBX -->
+
+    <script src="./Editor/editor/js/AMFLoader.js"></script>
+    <script src="./Editor/editor/js/ColladaLoader.js"></script>
+    <script src="./Editor/editor/js/DRACOLoader.js"></script>
+    <script src="./Editor/editor/js/FBXLoader.js"></script>
+    <script src="./Editor/editor/js/GLTFLoader.js"></script>
+    <script src="./Editor/editor/js/LegacyGLTFLoader.js"></script>
+    <script src="./Editor/editor/js/KMZLoader.js"></script>
+    <script src="./Editor/editor/js/MD2Loader.js"></script>
+    <script src="./Editor/editor/js/OBJLoader.js"></script>
+    <script src="./Editor/editor/js/MTLLoader.js"></script>
+    <script src="./Editor/editor/js/PLYLoader.js"></script>
+    <script src="./Editor/editor/js/STLLoader.js"></script>
+    <script src="./Editor/editor/js/SVGLoader.js"></script>
+    <script src="./Editor/editor/js/TGALoader.js"></script>
+    <script src="./Editor/editor/js/TDSLoader.js"></script>
+    <script src="./Editor/editor/js/VRMLLoader.js"></script>
+    <script src="./Editor/editor/js/VTKLoader.js"></script>
+
+    <script src="./Editor/editor/js/ColladaExporter.js"></script>
+    <script src="./Editor/editor/js/GLTFExporter.js"></script>
+    <script src="./Editor/editor/js/OBJExporter.js"></script>
+    <script src="./Editor/editor/js/STLExporter.js"></script>
+
+    <script src="./Editor/editor/js/Projector.js"></script>
+    <script src="./Editor/editor/js/RaytracingRenderer.js"></script>
+    <script src="./Editor/editor/js/SVGRenderer.js"></script>
+
+    <link rel="stylesheet" href="./Editor/editor/js/libs/codemirror/codemirror.css">
+    <link rel="stylesheet" href="./Editor/editor/js/libs/codemirror/theme/monokai.css">
+    <script src="./Editor/editor/js/libs/codemirror/codemirror.js"></script>
+    <script src="./Editor/editor/js/libs/codemirror/mode/javascript.js"></script>
+    <script src="./Editor/editor/js/libs/codemirror/mode/glsl.js"></script>
+
+    <script src="./Editor/editor/js/libs/system.min.js"></script>
+    <script src="./Editor/editor/js/libs/esprima.js"></script>
+    <script src="./Editor/editor/js/libs/jsonlint.js"></script>
+    <script src="./Editor/editor/js/libs/glslprep.min.js"></script>
+
+    <link rel="stylesheet" href="./Editor/editor/js/libs/codemirror/addon/dialog.css">
+    <link rel="stylesheet" href="./Editor/editor/js/libs/codemirror/addon/show-hint.css">
+    <link rel="stylesheet" href="./Editor/editor/js/libs/codemirror/addon/tern.css">
+    <script src="./Editor/editor/js/libs/codemirror/addon/dialog.js"></script>
+    <script src="./Editor/editor/js/libs/codemirror/addon/show-hint.js"></script>
+    <script src="./Editor/editor/js/libs/codemirror/addon/tern.js"></script>
+    <script src="./Editor/editor/js/libs/acorn/acorn.js"></script>
+    <script src="./Editor/editor/js/libs/acorn/acorn_loose.js"></script>
+    <script src="./Editor/editor/js/libs/acorn/walk.js"></script>
+    <script src="./Editor/editor/js/libs/ternjs/polyfill.js"></script>
+    <script src="./Editor/editor/js/libs/ternjs/signal.js"></script>
+    <script src="./Editor/editor/js/libs/ternjs/tern.js"></script>
+    <script src="./Editor/editor/js/libs/ternjs/def.js"></script>
+    <script src="./Editor/editor/js/libs/ternjs/comment.js"></script>
+    <script src="./Editor/editor/js/libs/ternjs/infer.js"></script>
+    <script src="./Editor/editor/js/libs/ternjs/doc_comment.js"></script>
+    <script src="./Editor/editor/js/libs/tern-threejs/threejs.js"></script>
+
+    <script src="./Editor/editor/js/libs/signals.min.js"></script>
+    <script src="./Editor/editor/js/libs/ui.js"></script>
+    <script src="./Editor/editor/js/libs/ui.three.js"></script>
+
+    <script src="./Editor/editor/js/libs/html2canvas.js"></script>
+    <script src="./Editor/editor/js/libs/three.html.js"></script>
+
+    <script src="./Editor/editor/js/libs/app.js"></script>
+    <script src="./Editor/editor/js/Player.js"></script>
+    <script src="./Editor/editor/js/Script.js"></script>
+
+    <script src="./Editor/editor/js/WebVR.js"></script><!--可无-->
+
+    <script src="./Editor/editor/js/EditorControls.js"></script>
+    <script src="./Editor/editor/js/Storage.js"></script>
+
+    <script src="./Editor/editor/js/Editor.js"></script>
+    <script src="./Editor/editor/js/Config.js"></script>
+    <script src="./Editor/editor/js/History.js"></script>
+    <script src="./Editor/editor/js/Loader.js"></script>
+
+    <!--引入文件只决定了menu的样式-->
+    <script src="./js/Menubar/Menubar.js"></script>
+    <script src="./js/Menubar/Menubar.Add.js"></script><!--menu总的调用-->
+    <script src="./js/Menubar/Menubar.File.js"></script>
+    <script src="./js/Menubar/Menubar.Edit.js"></script>
+    <script src="./js/Menubar/Menubar.Play.js"></script>
+    <script src="./js/Menubar/Menubar.View.js"></script>
+    <script src="./js/Menubar/Menubar.Examples.js"></script>
+    <script src="./js/Menubar/Menubar.Help.js"></script>
+
+    <script src="./js/Menubar/Menubar.Status.js"></script>
+    <script src="./js/Menubar/Menubar.Geometry.js"></script>
+    <script src="./js/Menubar/Menubar.Properties.js"></script>
+    <script src="./js/Menubar/Menubar.Conditions.js"></script>
+    <script src="./js/Menubar/Menubar.Analysis.js"></script>
+    <script src="./js/Menubar/Menubar.Results.js"></script>
+
+
+    <script src="./Editor/editor/js/Sidebar.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Scene.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Project.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Settings.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Settings.Shortcuts.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Settings.Viewport.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Properties.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Object.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.Geometry.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.BufferGeometry.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.Modifiers.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.BoxGeometry.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.CircleGeometry.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.CylinderGeometry.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.DodecahedronGeometry.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.ExtrudeGeometry.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.IcosahedronGeometry.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.OctahedronGeometry.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.PlaneGeometry.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.RingGeometry.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.SphereGeometry.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.ShapeGeometry.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.TetrahedronGeometry.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.TorusGeometry.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.TorusKnotGeometry.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.TubeGeometry.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.TeapotBufferGeometry.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Geometry.LatheGeometry.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Material.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Animation.js"></script>
+    <script src="./Editor/editor/js/Sidebar.Script.js"></script>
+    <script src="./Editor/editor/js/Sidebar.History.js"></script>
+    <script src="./Editor/editor/js/Strings.js"></script>
+    <script src="./Editor/editor/js/Toolbar.js"></script>
+    <script src="./Editor/editor/js/Viewport.js"></script><!--整个editor和上方菜单的外观，包括视角，rotate的设置-->
+    <script src="./Editor/editor/js/Viewport.Camera.js"></script>
+    <script src="./Editor/editor/js/Viewport.Info.js"></script>
+
+    <script src="./Editor/editor/js/Command.js"></script>
+    <script src="./Editor/editor/js/Commands/AddObjectCommand.js"></script>
+    <script src="./Editor/editor/js/Commands/RemoveObjectCommand.js"></script>
+    <script src="./Editor/editor/js/Commands/MoveObjectCommand.js"></script>
+    <script src="./Editor/editor/js/Commands/SetPositionCommand.js"></script>
+    <script src="./Editor/editor/js/Commands/SetRotationCommand.js"></script>
+    <script src="./Editor/editor/js/Commands/SetScaleCommand.js"></script>
+    <script src="./Editor/editor/js/Commands/SetValueCommand.js"></script>
+    <script src="./Editor/editor/js/Commands/SetUuidCommand.js"></script>
+    <script src="./Editor/editor/js/Commands/SetColorCommand.js"></script>
+    <script src="./Editor/editor/js/Commands/SetGeometryCommand.js"></script>
+    <script src="./Editor/editor/js/Commands/SetGeometryValueCommand.js"></script>
+    <script src="./Editor/editor/js/Commands/MultiCmdsCommand.js"></script>
+    <script src="./Editor/editor/js/Commands/AddScriptCommand.js"></script>
+    <script src="./Editor/editor/js/Commands/RemoveScriptCommand.js"></script>
+    <script src="./Editor/editor/js/Commands/SetScriptValueCommand.js"></script>
+    <script src="./Editor/editor/js/Commands/SetMaterialCommand.js"></script>
+    <script src="./Editor/editor/js/Commands/SetMaterialColorCommand.js"></script>
+    <script src="./Editor/editor/js/Commands/SetMaterialMapCommand.js"></script>
+    <script src="./Editor/editor/js/Commands/SetMaterialValueCommand.js"></script>
+    <script src="./Editor/editor/js/Commands/SetMaterialVectorCommand.js"></script>
+    <script src="./Editor/editor/js/Commands/SetSceneCommand.js"></script>
+
+    <script src='./Editor/editor/js/examples/js/lines/LineSegmentsGeometry.js'></script>
+    <script src='./Editor/editor/js/examples/js/lines/LineGeometry.js'></script>
+    <script src='./Editor/editor/js/examples/js/lines/LineMaterial.js'></script>
+    <script src='./Editor/editor/js/examples/js/lines/LineSegments2.js'></script>
+    <script src='./Editor/editor/js/examples/js/lines/Line2.js'></script>
+
+    <script>
+
+
+        //editor
+        //THREE.Cache.clear()     //内存释放
+
+        window.URL = window.URL || window.webkitURL;
+        window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+
+        Number.prototype.format = function () {
+            return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+        };
+
+        //
+
+        var editor = new Editor();//接下来所有基于editor的操作都要用这个对象实现
+
+        var viewport = new Viewport(editor);
+        document.body.appendChild(viewport.dom);
+
+        var toolbar = new Toolbar(editor);
+        document.body.appendChild(toolbar.dom);
+
+        var script = new Script(editor);
+        document.body.appendChild(script.dom);
+
+        var player = new Player(editor);
+        document.body.appendChild(player.dom);
+
+        var sidebar = new Sidebar(editor);
+        document.body.appendChild(sidebar.dom);//侧边栏
+
+        var menubar = new Menubar(editor);
+        document.body.appendChild(menubar.dom);//在此之前已经预留了位置
+
+
+        editor.storage.init(function () {
+
+            editor.storage.get(function (state) {
+
+                if (isLoadingFromHash) return;
+                /*
+                if (state !== undefined) {
+
+                    editor.fromJSON(state);
+
+                }
+                */
+                var selected = editor.config.getKey('selected');
+
+                if (selected !== undefined) {
+
+                    editor.selectByUuid(selected);
+
+                }
+
+            });
+
+            //
+
+            var timeout;
+
+
+
+            var signals = editor.signals;
+            /*
+            signals.geometryChanged.add(saveState);
+            signals.objectAdded.add(saveState);
+            signals.objectChanged.add(saveState);
+            signals.objectRemoved.add(saveState);
+            signals.materialChanged.add(saveState);
+            signals.sceneBackgroundChanged.add(saveState);
+            signals.sceneFogChanged.add(saveState);
+            signals.sceneGraphChanged.add(saveState);
+            signals.scriptChanged.add(saveState);
+            signals.historyChanged.add(saveState);
+            */
+        });
+
+        //
+
+        document.addEventListener('dragover', function (event) {
+
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'copy';
+
+        }, false);
+
+        document.addEventListener('drop', function (event) {
+
+            event.preventDefault();
+
+            editor.loader.loadFiles(event.dataTransfer.files);
+
+        }, false);
+
+        function onWindowResize(event) {
+
+            editor.signals.windowResize.dispatch();
+
+        }
+
+        window.addEventListener('resize', onWindowResize, false);
+
+        onWindowResize();
+
+        //
+
+        var isLoadingFromHash = false;
+        var hash = window.location.hash;
+
+        if (hash.substr(1, 5) === 'file=') {
+
+            var file = hash.substr(6);
+
+            if (confirm('Any unsaved data will be lost. Are you sure?')) {
+
+                var loader = new THREE.FileLoader();
+                loader.crossOrigin = '';
+                loader.load(file, function (text) {
+
+                    editor.clear();
+                    editor.fromJSON(JSON.parse(text));
+
+                });
+
+                isLoadingFromHash = true;
+
+            }
+
+        }
+
+
+        /*
+        window.addEventListener( 'message', function ( event ) {
+
+            editor.clear();
+            editor.fromJSON( event.data );
+
+        }, false );
+        */
+
+
+    </script>
+    <script src="./Axis.js"></script>
+    <script src="./Geometry1.js"></script>
+</body>
+</html>

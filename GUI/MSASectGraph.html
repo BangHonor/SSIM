@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0
+        }
+    </style>
+</head>
+<body>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+    <script src="js/jquery/jquery.js"></script>
+    <script src="js/pixi.min.js"></script>
+    <script>
+
+        const app = new PIXI.Application({
+            width: 320,
+            height: 270,
+            antialias: true,    // default: false
+            transparent: false, // default: false
+            resolution: 1       // default: 1
+        })
+        app.renderer.backgroundColor = 0xffffff;
+        document.body.appendChild(app.renderer.view)
+
+        //画线
+        function drawLine(x0, y0, x1, y1) {
+            let lineZ = new PIXI.Graphics();
+            lineZ.lineStyle(1, 0x000000, 1);
+            lineZ.moveTo(x0, y0);
+            lineZ.lineTo(x1, y1);
+            app.stage.addChild(lineZ);
+        }
+
+        let style = new PIXI.TextStyle({
+            fontFamily: "Arial",
+            fontSize: 20,
+
+            fill: "black"
+        });
+
+        //文字
+        function drawMessage(text, x, y) {
+            let message = new PIXI.Text(text, style);
+            message.position.set(x, y)
+            app.stage.addChild(message);
+        }
+
+        //从左上算坐标
+        function drawRec(x, y, width, height) {
+            let rectangle = new PIXI.Graphics();
+            rectangle.beginFill(0x000000);
+            rectangle.drawRect(x, y, width, height);
+            rectangle.endFill();
+            app.stage.addChild(rectangle);
+        }
+
+        function drawCircle(x, y, rad) {
+            let circle = new PIXI.Graphics();
+            circle.beginFill(0x808080);
+            circle.drawCircle(x, y, rad);
+            circle.endFill();
+            app.stage.addChild(circle);
+        }
+
+        //画椭圆
+        function drawEllipse(x, y, width, height) {
+            let ellipse = new PIXI.Graphics();
+            ellipse.lineStyle(4, 0x000000, 1);
+            ellipse.drawEllipse(0, 0, width, height);
+            ellipse.endFill();
+            ellipse.x = x;
+            ellipse.y = y;
+            app.stage.addChild(ellipse);
+        }
+
+        //指向正方向的箭头
+        function drawUpTriangle(x, y) {
+            let triangle = new PIXI.Graphics();
+            triangle.beginFill(0x000000);
+
+            triangle.drawPolygon([
+                0, 0,             //First point
+                -5, 10,              //Second point
+                5, 10                 //Third point
+            ]);
+
+            triangle.endFill();
+            triangle.x = x;
+            triangle.y = y;
+            app.stage.addChild(triangle);
+        }
+
+
+        function drawDownTriangle(x, y) {
+            let triangle = new PIXI.Graphics();
+            triangle.beginFill(0x000000);
+
+            triangle.drawPolygon([
+                0, 0,             //First point
+                -5, -10,              //Second point
+                5, -10                 //Third point
+            ]);
+
+            triangle.endFill();
+            triangle.x = x;
+            triangle.y = y;
+            app.stage.addChild(triangle);
+        }
+
+        function drawLeftTriangle(x, y) {
+            let triangle = new PIXI.Graphics();
+            triangle.beginFill(0x000000);
+
+            triangle.drawPolygon([
+                0, 0,             //First point
+                10, 5,              //Second point
+                10, -5                 //Third point
+            ]);
+
+            triangle.endFill();
+            triangle.x = x;
+            triangle.y = y;
+            app.stage.addChild(triangle);
+        }
+
+        function drawRightTriangle(x, y) {
+            let triangle = new PIXI.Graphics();
+            triangle.beginFill(0x000000);
+
+            triangle.drawPolygon([
+                0, 0,             //First point
+                -10, 5,              //Second point
+                -10, -5                 //Third point
+            ]);
+
+            triangle.endFill();
+            triangle.x = x;
+            triangle.y = y;
+            app.stage.addChild(triangle);
+        }
+
+
+        //Y方向的注释（长）
+        function drawYComments(text, x0, y0, x1, y1) {
+            //包括了线 箭头 和两边的短线
+            drawLine(x0, y0, x1, y1);
+            drawLine(x0 - 7, y0, x0 + 7, y0);
+            drawLine(x1 - 7, y1, x1 + 7, y1);
+            drawUpTriangle(x0, y0);
+            drawDownTriangle(x1, y1);
+            drawMessage(text, x0 - 15, (y0 + y1) / 2);
+
+        }
+
+        //Z方向的注释（长）
+        function drawZComments(text, x0, y0, x1, y1) {
+            drawLine(x0, y0, x1, y1);
+            drawLine(x0, y0 - 7, x0, y0 + 7);
+            drawLine(x1, y1 - 7, x1, y1 + 7);
+            drawLeftTriangle(x0, y0);
+            drawRightTriangle(x1, y1);
+            drawMessage(text, (x0 + x1) / 2, y0 - 15);
+        }
+
+        //短注释,传入坐标为矩形中心
+        function drawShortZ(text, x, y) {
+            drawLine(x - 2.5, y, x - 22.5, y);
+            drawLine(x + 2.5, y, x + 22.5, y);
+            drawLine(x - 2.5, y - 7, x - 2.5, y + 7);
+            drawLine(x + 2.5, y - 7, x + 2.5, y + 7);
+            drawLeftTriangle(x + 2.5, y);
+            drawRightTriangle(x - 2.5, y);
+            drawMessage(text, x + 10, y + 10);
+        }
+
+        //短注释,传入坐标为矩形中心
+        function drawShortY(text, x, y) {
+            drawLine(x, y - 2.5, x, y - 22.5);
+            drawLine(x, y + 2.5, x, y + 22.5);
+            drawLine(x - 7, y + 2.5, x + 7, y + 2.5);
+            drawLine(x - 7, y - 2.5, x + 7, y - 2.5);
+            drawUpTriangle(x, y + 2.5);
+            drawDownTriangle(x, y - 2.5);
+            drawMessage(text, x + 10, y - 10);
+        }
+
+        //画完整的坐标轴
+        function drawAxial() {
+            //画坐标轴
+            drawLine(20, 135, 300, 135);
+            drawLine(160, 0, 160, 260);
+            drawLine(20, 135, 30, 130);
+            drawLine(20, 135, 30, 140);
+            drawLine(160, 0, 155, 10);
+            drawLine(160, 0, 165, 10);
+            drawMessage("Y", 170, 0);
+            drawMessage("Z", 10, 115);
+        }
+
+
+        var type = window.parent.document.getElementsByName("type");
+        type[0].onclick = function () {
+            app.stage.removeChildren()
+
+            window.parent.document.getElementById("content2").innerHTML = `<div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B1=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" name="B1" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t1=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able"  style="width:100px;" name="t1"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B2=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;" name="B2"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t2=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;" name="t2"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;D=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able"style="width:100px;" name="D"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tf2=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;" name="t3"></div>`
+
+            drawAxial();
+            drawRec(80, 40, 160, 5);//上
+            drawRec(120, 230, 80, 5);//下
+            drawRec(157.5, 40, 5, 190);//从左边算，中间
+            drawMessage("SC", 170, 110);
+            drawMessage("GC", 170, 135);
+            drawCircle(160, 135, 5);
+            drawCircle(160, 115, 5);
+
+            //注释
+            drawYComments("D", 75, 40, 75, 230)
+            drawZComments("B2", 120, 250, 200, 250)
+            drawZComments("B1", 80, 30, 240, 30)
+            drawShortZ("t3", 160, 180)
+            drawShortY("t2", 220, 232.5)
+            drawShortY("t1", 260, 42.5)
+
+        }
+
+        type[1].onclick = function () {
+            app.stage.removeChildren()
+            window.parent.document.getElementById("content2").innerHTML = `<div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t1=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;D=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t2=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>`
+
+            drawAxial();
+            drawRec(80, 40, 160, 5);//上
+            drawRec(157.5, 40, 5, 190);//从左边算，中间
+            drawMessage("SC", 170, 50);
+            drawMessage("GC", 170, 135);
+            drawCircle(160, 135, 5);
+            drawCircle(160, 42.5, 5);
+
+            //注释
+            drawYComments("D", 75, 40, 75, 230)
+            drawZComments("B", 80, 30, 240, 30)
+            drawShortZ("t2", 160, 180)
+            drawShortY("t1", 260, 42.5)
+        }
+
+        type[2].onclick = function () {
+            app.stage.removeChildren()
+
+            window.parent.document.getElementById("content2").innerHTML =
+                `<div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B1=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t1=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B2=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t2=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text"  class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;D=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text"  class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t3=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>`
+
+            drawAxial();
+            drawRec(80, 40, 80, 5);//上
+            drawRec(160, 225, 80, 5);//下
+            drawRec(157.5, 40, 5, 190);//从左边算，中间
+            drawMessage("SC", 170, 110);
+            drawMessage("GC", 170, 135);
+            drawCircle(160, 135, 5);
+
+
+            //注释
+            drawYComments("D", 75, 40, 75, 230)
+            drawZComments("B2", 160, 250, 240, 250)
+            drawZComments("B1", 80, 30, 160, 30)
+            drawShortZ("t2", 160, 180)
+            drawShortY("t3", 250, 232.5)
+            drawShortY("t1", 170, 42.5)
+
+        }
+
+        type[3].onclick = function () {
+            app.stage.removeChildren()
+
+            window.parent.document.getElementById("content2").innerHTML =
+
+                `<div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tf=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able"  style="width:100px;"></div>
+                            <div class="item" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;D=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tw=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;k=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            `
+
+            drawAxial();
+            drawRec(80, 40, 100, 5);//上
+            drawRec(80, 225, 100, 5);//下
+            drawRec(177.5, 40, 5, 190);//从左边算，中间
+            drawMessage("SC", 210, 115);
+            drawMessage("GC", 140, 115);
+            drawCircle(200, 135, 5);
+            drawCircle(160, 135, 5);
+
+
+            //注释
+            drawYComments("D", 275, 40, 275, 230)
+            drawZComments("B", 80, 30, 180, 30)
+            drawShortZ("tw", 180, 180)
+            drawShortY("tf", 45, 42.5)
+
+        }
+
+        type[4].onclick = function () {
+            app.stage.removeChildren()
+
+            window.parent.document.getElementById("content2").innerHTML =
+
+                `<div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t2=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;D=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t1=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>`
+
+            drawAxial();
+            drawRec(80, 225, 100, 5);//下
+            drawRec(177.5, 40, 5, 190);//从左边算，中间
+            drawMessage("SC", 200, 225);
+            drawMessage("GC", 140, 115);
+            drawCircle(180, 225, 5);
+            drawCircle(160, 135, 5);
+
+
+            //注释
+            drawYComments("D", 275, 40, 275, 230)
+            drawZComments("B", 80, 250, 180, 250)
+            drawShortZ("t1", 180, 180)
+            drawShortY("t2", 45, 222.5)
+
+        }
+
+        type[5].onclick = function () {
+            app.stage.removeChildren()
+
+            window.parent.document.getElementById("content2").innerHTML =
+
+                `<div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tw=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;D=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            `
+
+            drawAxial();
+            drawEllipse(160, 135, 90, 60);
+            drawMessage("SC", 130, 135);
+            drawMessage("GC", 165, 135);
+            drawCircle(160, 135, 5);
+
+
+            //注释
+            drawZComments("B", 70, 60, 250, 60)
+            drawYComments("D", 60, 75, 60, 195)
+            drawShortZ("t1", 250, 135)
+
+        }
+
+        type[6].onclick = function () {
+            app.stage.removeChildren()
+            window.parent.document.getElementById("content2").innerHTML = `<div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tw=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;D=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tf=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>`
+
+            drawAxial();
+
+            //画一个带边框的空心矩形
+            let rectangle = new PIXI.Graphics();
+            rectangle.lineStyle(4, 0x000000, 1);
+            rectangle.drawRect(80, 80, 160, 110);
+            rectangle.endFill();
+            app.stage.addChild(rectangle);
+
+            drawMessage("SC", 130, 135);
+            drawMessage("GC", 170, 135);
+            drawCircle(160, 135, 5);
+
+            //注释
+            drawYComments("D", 70, 80, 70, 190)
+            drawZComments("B", 80, 60, 240, 60)
+            drawShortZ("tw", 240, 220)
+            drawShortY("tf", 260, 190)
+        }
+
+        type[7].onclick = function () {
+            app.stage.removeChildren()
+            window.parent.document.getElementById("content2").innerHTML = `<div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B1=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;t1=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B2=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tf2=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;D=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>
+                            <div class="item content_grid1" style="display:inline"><label style="background-color:lightgrey;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;tf2=&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;<input type="text" class="able" style="width:100px;"></div>`
+
+            drawAxial();
+
+            //画一个带边框的空心多边形
+            let poly = new PIXI.Graphics();
+            poly.lineStyle(4, 0x000000, 1);
+            poly.drawPolygon([
+                160, 60,
+                200, 60,
+                240, 210,
+                80, 210,
+                120, 60
+            ]);
+
+            //Fill shape's color
+            poly.endFill();
+            //Position the triangle after you've drawn it.
+            //The triangle's x/y position is anchored to its first point in the path
+            app.stage.addChild(poly);
+
+            drawMessage("SC", 130, 135);
+            drawMessage("GC", 170, 135);
+            drawCircle(160, 135, 5);
+
+            //注释
+            drawYComments("D", 50, 60, 50, 210)
+            drawZComments("B1", 120, 40, 200, 40)
+            drawZComments("B2", 80, 240, 240, 240)
+            drawShortY("tf2", 250, 210)
+            drawShortY("tf1", 250, 60)
+
+            //斜注释
+            let triangle = new PIXI.Graphics()
+            triangle.beginFill(0x000000)
+
+            triangle.drawPolygon([
+                0, 0,             //First point
+                -10, -5,              //Second point
+                -5, 10             //Third point
+            ]);
+
+            triangle.endFill();
+            triangle.x = 220;
+            triangle.y = 135;
+
+            let triangle2 = new PIXI.Graphics()
+            triangle2.beginFill(0x000000)
+
+            triangle2.drawPolygon([
+                0, 0,             //First point
+                10, 5,              //Second point
+                5, -10                //Third point
+            ]);
+
+            triangle2.endFill();
+            triangle2.x = 220;
+            triangle2.y = 135;
+            drawMessage("t1", 220, 105);
+            drawLine(200, 145, 220, 135);
+            drawLine(240, 125, 220, 135);
+            app.stage.addChild(triangle, triangle2);
+        }
+
+        type[8].onclick = function () {
+            app.stage.removeChildren()
+            parent.document.getElementById("content2").innerHTML = `
+                <div style="font-size:18px;color:yellow">&emsp;Please click the Next</div><div style="font-size:18px;color:yellow"> button to proceed</div>
+                <button onclick="General()">Next</button>`
+        }
+
+
+    </script>
+</body>
+</html>
